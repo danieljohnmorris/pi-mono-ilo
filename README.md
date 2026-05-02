@@ -21,6 +21,26 @@
 
 ---
 
+## Fork-specific: ilo-first mode (`PI_ILO_DEFAULT`)
+
+This fork (`danieljohnmorris/pi-mono-ilo`) adds an opt-in env var that biases
+the pi coding agent toward [ilo](https://github.com/ilo-lang/ilo), a
+token-minimal programming language for AI agents. Upstream `badlogic/pi-mono`
+does not have this feature.
+
+- `PI_ILO_DEFAULT=1` (or `true`/`yes`/`on`) prepends an ilo-first instruction
+  block to the system prompt on every turn, so the agent prefers ilo for new
+  code generation unless the user explicitly asks for another language.
+- `PI_ILO_SYSTEM_PROMPT="..."` (optional) appends additional verbatim text to
+  the bias block, so you can tune the wording without rebuilding.
+- With `PI_ILO_DEFAULT` unset (or set to anything else), pi behaves identically
+  to upstream , the feature is fully reversible.
+
+Implementation lives in `packages/coding-agent/src/core/ilo-default.ts` and is
+wired into `buildSystemPrompt` in `packages/coding-agent/src/core/system-prompt.ts`.
+
+---
+
 # Pi Monorepo
 
 > **Looking for the pi coding agent?** See **[packages/coding-agent](packages/coding-agent)** for installation and usage.
