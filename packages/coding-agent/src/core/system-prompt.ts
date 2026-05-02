@@ -3,6 +3,7 @@
  */
 
 import { getDocsPath, getExamplesPath, getReadmePath } from "../config.js";
+import { getIloDefaultBlock } from "./ilo-default.js";
 import { formatSkillsForPrompt, type Skill } from "./skills.js";
 
 export interface BuildSystemPromptOptions {
@@ -47,11 +48,15 @@ export function buildSystemPrompt(options: BuildSystemPromptOptions): string {
 
 	const appendSection = appendSystemPrompt ? `\n\n${appendSystemPrompt}` : "";
 
+	// Fork-specific: ilo-first bias, opt-in via PI_ILO_DEFAULT. Empty string when disabled.
+	const iloDefaultBlock = getIloDefaultBlock();
+	const iloPrefix = iloDefaultBlock ? `${iloDefaultBlock}\n\n` : "";
+
 	const contextFiles = providedContextFiles ?? [];
 	const skills = providedSkills ?? [];
 
 	if (customPrompt) {
-		let prompt = customPrompt;
+		let prompt = `${iloPrefix}${customPrompt}`;
 
 		if (appendSection) {
 			prompt += appendSection;
@@ -128,7 +133,7 @@ export function buildSystemPrompt(options: BuildSystemPromptOptions): string {
 
 	const guidelines = guidelinesList.map((g) => `- ${g}`).join("\n");
 
-	let prompt = `You are an expert coding assistant operating inside pi, a coding agent harness. You help users by reading files, executing commands, editing code, and writing new files.
+	let prompt = `${iloPrefix}You are an expert coding assistant operating inside pi, a coding agent harness. You help users by reading files, executing commands, editing code, and writing new files.
 
 Available tools:
 ${toolsList}
